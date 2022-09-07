@@ -1,9 +1,13 @@
 <template>
   <div>
-    <router-view></router-view>
+    <!-- <router-view></router-view> -->
+    <h1>{{ count }}</h1>
+    <h2>{{ bigNum }}</h2>
+    <button @click="SET_COUNT(10)">点击+1</button>
   </div>
 </template>
 <script>
+import { mapGetters, mapMutations, mapState } from 'vuex'
 // 1.下载Vant:vant@latest-v2 -S
 // (1)在main.js中引入组件和css
 // 3.rem适配
@@ -14,7 +18,18 @@
 // post-css  css的预处理器，自己能干的事情很少，下载插件
 // 下载 yarn add postcss-pxtorem
 // 告诉postcss,我们要使用这个插件，新建.postcssrc.js文件
-export default {}
+export default {
+  methods: {
+    /* increment() {
+      this.$store.commit('SET_COUNT', 10)
+    } */
+    ...mapMutations(['SET_COUNT'])
+  },
+  computed: {
+    ...mapState(['count']),
+    ...mapGetters(['bigNum'])
+  }
+}
 </script>
 
 <style>
