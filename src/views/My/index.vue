@@ -16,9 +16,9 @@
                 round
                 width="1.5rem"
                 height="1.5rem"
-                src="https://img01.yzcdn.cn/vant/cat.jpeg"
+                :src="userInfo.photo"
               />
-              <span class="mobile">13111111111</span>
+              <span class="mobile">{{ userInfo.name }}</span>
             </van-row>
           </van-col>
           <van-col span="7"></van-col>
@@ -89,11 +89,16 @@
 <script>
 import { mapGetters } from 'vuex'
 import mobileSrc from '@/assets/images/mobile.png'
+import { getUserInfoAPI } from '@/api'
 export default {
   data() {
     return {
-      mobileSrc
+      mobileSrc,
+      userInfo: {}
     }
+  },
+  created() {
+    this.getUserInfo()
   },
   methods: {
     async logout() {
@@ -102,6 +107,20 @@ export default {
         message: '是否确认退出该账号'
       })
       this.$store.commit('SET_TOKEN', {})
+    },
+    async getUserInfo() {
+      try {
+        if (!this.isLogin) return
+        const { data } = await getUserInfoAPI()
+        this.userInfo = data.data
+        console.log(data)
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.$tost.fail('用户认证失败，请重新登陆')
+        } else {
+          throw error
+        }
+      }
     }
   },
   computed: {
