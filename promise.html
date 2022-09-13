@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Document</title>
+</head>
+<body>
+ <script>
+ // 1.new调用Promise时传入的参数
+ // 2.   -resolvec 成功
+ //      -reject   失败
+ // 3.声明两个变量： value:成功的原因  reason:失败的原因
+ // 4.promise有三种状态:1.pending准备态 2.fulfilled完成态 3.rejected拒绝态
+ //      -当进入promise的时候需要修改状态 默认准备态
+ // 5.Promise状态只能改变一次:pending-->fulfilled;pending-->rejected 不能 完成态 拒绝态相互转换
+ // 6.当Promise在执行过程当中，任何错误都会导致promise状态时失败太
+ 
+
+ const PENDING = 'pending'
+ const FULFILLED = 'fulfilled'
+ const REJECTED = 'rejected'
+ const onFulfilledCallBacks=[]
+ const onRejectedCallBacks=[]
+ class Promise {
+ // 成员变量
+ value
+ reason
+ status = PENDING
+
+ constructor(executor) {
+ const resolve = (value) => { 
+if (this.status === PENDING ) {
+ this.value = value
+ this.status = FULFILLED
+ //  this.onFulfilled(this.value)
+ this.onFulfilledCallBacks.forEach(cb=>cb())
+}
+ }
+
+ const reject = (reason) => { 
+ if (this.status === PENDING ) {
+ this.reason = reason
+ this.status = REJECTED
+//  this.onRejected(this.reason)
+this.onRejectedCallBacks.forEach(cb=>cb())
+ }
+ }
+
+try {
+ executor(resolve,reject) // 当定义并传入 才可以实现
+} catch (error) {
+ reject(error)
+}
+ }
+ 
+ then(onFulfilled,onRejected) {
+ if(this.status === FULFILLED ) {
+  onFulfilled(this.value)
+ }
+ if(this.status === REJECTED) {
+  onRejected(this.reason)
+ }
+ if(this.status===PENDING){
+    // 异步
+    // 订阅
+    // this.onFulfilled=onFulfilled
+    // this.onRejected=onRejected
+    this.onFulfilledCallBacks.push(()=>{
+        onFulfilled(this.value)
+    })
+    this.onRejectedCallBacks.push(()=>{
+        onRejected(this.reason)
+    })
+ }
+ }
+
+ }
+ const p = new Promise((resolve,reject) => { 
+ // throw new error
+  setTimeout(()=>{
+    resolve('成功')
+    // reject('失败')
+  },1000)
+ })
+ p.then(
+    (res)=>console.log('第一次then',res),
+ )
+ p.then(
+    (res)=>console.log('第二次then',res),
+ )
+//  console.log(p);
+//  p.then(
+//  (res) => console.log(res),
+//  (err) => console.log(err)
+//  )
+</script>
+</body>
+</html>

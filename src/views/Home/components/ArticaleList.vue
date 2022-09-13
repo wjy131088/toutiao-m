@@ -1,10 +1,23 @@
 <template>
-  <div>
-    <articale-item
-      v-for="item in articles"
-      :key="item.art_id"
-      :article="item"
-    ></articale-item>
+  <div class="article">
+    <van-pull-refresh v-model="refreshLoading" @refresh="getNextPageArticle">
+      <van-list
+        v-model="loading"
+        @load="getNextPageArticle"
+        offset="100"
+        :immediate-check="false"
+        :finished="finished"
+        :error.sync="error"
+        error-text="请求失败，点击重新加载"
+        finished-text="没有更多了"
+      >
+        <articale-item
+          v-for="item in articles"
+          :key="item.art_id"
+          :article="item"
+        ></articale-item>
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -20,7 +33,12 @@ export default {
   },
   data() {
     return {
-      articles: []
+      articles: [],
+      preTimestamp: '',
+      loading: false,
+      finished: false,
+      error: false,
+      refreshLoading: false
     }
   },
   created() {
@@ -30,8 +48,9 @@ export default {
     async getFirstPageArticle() {
       try {
         const { data } = await getArticlesAPI(this.id, +new Date())
-        console.log(data)
+        // console.log(data)
         this.articles = data.data.results
+        this.preTimestamp = data.data.pre_timestamp
       } catch (error) {
         // js错误，上抛。400上抛中文，507原封不动上抛
         const status = error.response?.status
@@ -44,9 +63,42 @@ export default {
           }
         }
       }
+    },
+    async getNextPageArticle() {
+      try {
+        const { data } = await getArticlesAPI(this.id, this.preTimestamp)
+        if (!data.data.pre_timestamp) {
+          this.finished = true
+        }
+        if (this.refreshLoading) {
+          this.articles.unshift(...data.data.results)
+        } else {
+          this.articles.push(...data.data.results)
+        }
+        this.preTimestamp = data.data.pre_timestamp
+        // this.loading = false
+      } catch (error) {
+        this.error = true
+      } finally {
+        this.loading = false
+        this.refreshLoading = false
+      }
     }
   }
 }
 </script>
 
-<style></style>
+<style lang="less" scoped>
+.article {
+  height: calc(100vh - 92px - 83px - 100px);
+  overflow: auto;
+  &::-webkit-scrollbar {
+    width: 10px;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #3296fa;
+    border-radius: 10px;
+  }
+}
+</style>
