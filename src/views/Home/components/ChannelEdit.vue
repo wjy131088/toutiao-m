@@ -9,12 +9,12 @@
         round
         style="color: red; border-color: red"
         @click="isEdit = !isEdit"
-        >编辑</van-button
+        >{{ isEdit ? '完成' : '编辑' }}</van-button
       >
     </van-cell>
     <!-- 频道 -->
     <div class="my-pannel">
-      <van-grid gutter="10" :border="false">
+      <van-grid gutter="6" :border="false">
         <van-grid-item
           v-for="(item, index) in myChannels"
           :class="{ active: item.name === '推荐' }"
@@ -30,12 +30,13 @@
     <van-cell title="推荐频道"></van-cell>
     <!-- 频道 -->
     <div class="recommend-pannel">
-      <van-grid gutter="10" :border="false">
+      <van-grid gutter="6" :border="false">
         <van-grid-item
           v-for="item in recommendChannels"
           :key="item.id"
           :text="item.name"
           icon="plus"
+          @click="$emit('add-channel', item)"
         />
       </van-grid>
     </div>
@@ -74,9 +75,10 @@ export default {
       console.log(data)
       this.allChannels = data.data.channels
     },
-    handleMyChannels({ name }, index) {
+    handleMyChannels({ name, id }, index) {
       if (this.isEdit && name !== '推荐') {
-        console.log('删除频道', name)
+        // console.log('删除频道', name)
+        this.$emit('del-channel', id)
       } else {
         // 关闭弹窗
         // 切换频道
