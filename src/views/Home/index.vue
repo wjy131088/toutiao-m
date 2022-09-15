@@ -3,7 +3,13 @@
     <!-- 搜索框 -->
     <van-nav-bar class="navbar">
       <template #title>
-        <van-button :hairline="false" icon="search" size="small" round block
+        <van-button
+          @click="$router.push('/search')"
+          :hairline="false"
+          icon="search"
+          size="small"
+          round
+          block
           >搜索</van-button
         >
       </template>
@@ -67,7 +73,7 @@ export default {
         // 未登录
         // 本地存储有数据，channels用本地存储
         // 本地存储没数据，发送请求，获取默认的频道数据
-        const myChannels = this.store.state.myChannels
+        const myChannels = this.$store.state.myChannels
         if (myChannels.length === 0) {
           this.getChannel()
         } else {

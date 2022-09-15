@@ -21,7 +21,11 @@ const routes = [
       { path: '/profile', component: () => import('@/views/My') }
     ]
   },
-  { path: '/login', component: () => import('@/views/Login') }
+  { path: '/login', component: () => import('@/views/Login') },
+  {
+    path: '/search',
+    component: () => import(/* webpackChunkName:'Search */ '@/views/Search')
+  }
 ]
 
 const router = new VueRouter({
